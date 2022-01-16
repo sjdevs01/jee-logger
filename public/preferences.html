@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/133a7fcf38.js" crossorigin="anonymous"></script>
+    <title>Type</title>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-1">
+            <div class="s1-initial">S</div>
+            <div class="s1-name">Shivansh</div>
+            <div class="s1-icon"><i class="fa fa-angle-down"></i></div>
+        </div>
+        <div class="sidebar-2">
+            <div class="s2-item overview">
+                <div class="s2-icon"><i class="far fa-star"></i></div>
+                <div class="s2-link">Overview</div>
+            </div>
+            <div class="s2-item log">
+                <div class="s2-icon"><i class="fas fa-tasks"></i></div>
+                <div class="s2-link">Log Work</div>
+            </div>
+            <div class="s2-item spreadsheet">
+                <div class="s2-icon"><i class="fas fa-table"></i></div>
+                <div class="s2-link">Spreadsheet</div>
+            </div>
+            <div class="s2-item preferences">
+                <div class="s2-icon"><i class="fas fa-cogs"></i></div>
+                <div class="s2-link">Preferences</div>
+            </div>
+        </div>  
+    </div>
+    <div class="main">
+        <div class="heading">
+            <div class="icon"><i class="fa fa-book"></i></div>
+            <h1>Log</h1>
+        </div>
+        <div class="form">
+            <div class="subject">
+                <input list="topics_list" class="form-input" id="interval" placeholder="Revision Interval (Def: 14)" /> <br>
+                <input type="number" id='strong' class="form-input" placeholder="Strong Topic Scores (Def: 85)" min="1"><br>
+                <input type="number" id='weak' class="form-input" placeholder="Weak Topic Scores (Def: 70)" min="1"><br>
+                <h3>Time/Question</h3>
+                <input type="number" id='oc' class="form-input" placeholder="Organic (Def: 1.5)" min="1" max="8"><br>
+                <input type="number" id='ic' class="form-input" placeholder="Inorganic (Def: 1.5)" min="1" max="8"><br>
+                <input type="number" id='pc' class="form-input" placeholder="Physical (Def: 3.5)" min="1" max="8"><br>
+                <input type="number" id='ph' class="form-input" placeholder="Physics (Def: 5)" min="1" max="8"><br>
+                <input type="number" id='mt' class="form-input" placeholder="Maths (Def: 4.5)" min="1" max="8"><br>
+                <button type="submit" id="submit">Update</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let _ = (el) => { return (+document.querySelector('#'+el).value) };
+        let $ = (el, x) => { return document.querySelector('#'+el).value = x; };
+
+        document.querySelector('#submit').addEventListener('click', () => {
+            fetch('http://dash.sjdev.in/update/preferences', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(
+                {
+                    "configs": {
+                        revision_interval: _('interval'),
+                        strong: _('strong'),
+                        weak: _('weak'),    
+                    },
+                    "times":{
+                        Organic: _('oc'),
+                        Physical: _('pc'),
+                        Inorganic: _('ic'),
+                        Physics: _('ph'),
+                        Maths: _('mt')
+                    }
+                })
+            })
+            window.alert('Updated preferences.')
+        })
+
+        fetch('http://dash.sjdev.in/fetch/preferences')
+        .then(r => r.json())
+        .then(data => {
+            let {a,b,c,d,e,f,g,h} = data;
+            $('interval',a);
+            $('strong', b);
+            $('weak',c);
+            $('oc',d);
+            $('ic',e);
+            $('pc',f);
+            $('ph',g);
+            $('mt',h);
+        })
+    </script>
+    <script src="./script.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/133a7fcf38.js" crossorigin="anonymous"></script>
+    <script src="isotope.js"></script>
+    <title>Type</title>
+    <style>
+        .grid_thing{
+            border-radius: 5px;
+            margin-right:20px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color:rgba(255,255,255,0.9);
+            padding:12px;
+            width:max-content;
+            cursor: pointer;
+        }
+
+        .red{
+            background: #A63D40 !important;
+        }
+
+        .yellow{
+            background: #DB9D47 !important;
+        }
+
+        .green{
+            background: #399E5A !important;
+        }
+
+        .suggestions{
+            display: flex;
+            flex-wrap: wrap;
+            width: 65vw;
+            margin-top: -10px;
+        }
+
+        h2{
+            font-size: 32px;
+            color: rgba(255,255,255,0.9);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-1">
+            <div class="s1-initial">S</div>
+            <div class="s1-name">Shivansh</div>
+            <div class="s1-icon"><i class="fa fa-angle-down"></i></div>
+        </div>
+        <div class="sidebar-2">
+            <div class="s2-item overview">
+                <div class="s2-icon"><i class="far fa-star"></i></div>
+                <div class="s2-link">Overview</div>
+            </div>
+            <div class="s2-item log">
+                <div class="s2-icon"><i class="fas fa-tasks"></i></div>
+                <div class="s2-link">Log Work</div>
+            </div>
+            <div class="s2-item spreadsheet">
+                <div class="s2-icon"><i class="fas fa-table"></i></div>
+                <div class="s2-link">Spreadsheet</div>
+            </div>
+            <div class="s2-item preferences">
+                <div class="s2-icon"><i class="fas fa-cogs"></i></div>
+                <div class="s2-link">Preferences</div>
+            </div>
+        </div>  
+    </div>
+    <div class="main">
+        <div class="heading">
+            <div class="icon"><i class="fa fa-star"></i></div>
+            <h1>Overview</h1>
+        </div>
+        
+        <div class="content" style="display: flex;">
+            <div class="time">
+                <h3>Been a While</h3>
+            </div>
+            <div class="weak">
+                <h3>Weak Topics</h3>
+            </div>
+            <div class="strong">
+                <h3>Strong Topics</h3>
+            </div>
+        </div>
+        <h2>Revise</h2>
+        <div class="suggestions grid"></div>
+    </div>
+    <script src="./script.js"></script>
+    <script>
+        function initiate(){
+            fetch('http://dash.sjdev.in/fetch/overview')
+            .then(r => r.json())
+            .then(d => {
+                console.log(d)
+                Object.keys(d.topics).forEach(i => {
+                    let arr = ['red','green','yellow']
+                    d.topics[i].forEach((l,x) =>  document.querySelector('.suggestions').innerHTML += `<div class='grid_thing ${arr[Math.floor(Math.random()*3)]}'>${l}</div>`)
+                })
+                Object.keys(d.last).forEach(i => {
+                    document.querySelector('.time').innerHTML += `<h4 style='color:rgb(245, 190, 89);'>${i}</h4>`
+                    d.last[i].forEach(l =>  document.querySelector('.time').innerHTML += `<p>${l}&nbsp;</p>`)
+                })
+                Object.keys(d.weak).forEach(i => {
+                    document.querySelector('.weak').innerHTML += `<h4 style='color: rgba(234, 135, 140, 1);'>${i}</h4>`
+                    d.weak[i].forEach(l =>  document.querySelector('.weak').innerHTML += `<p>${l}&nbsp;</p>`)
+                })
+                Object.keys(d.strong).forEach(i => {
+                    document.querySelector('.strong').innerHTML += `<h4 style='color: rgba(234, 135, 140, 1);'>${i}</h4>`
+                    d.strong[i].forEach(l =>  document.querySelector('.strong').innerHTML += `<p>${l}&nbsp;</p>`)
+                })
+            })
+        }
+
+        setTimeout(() => {
+            Array.from(document.querySelectorAll('.grid_thing')).forEach(i => {
+                console.log(i)
+                i.addEventListener('click', () => {
+                    window.open(`https://www.embibe.com/search/Test?q=${i.textContent}`)
+                })
+            })
+        }, 1000)
+        initiate()
+    </script>
+</body>
+</html>

@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/133a7fcf38.js" crossorigin="anonymous"></script>
+    <title>Type</title>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="sidebar-1">
+            <div class="s1-initial">S</div>
+            <div class="s1-name">Shivansh</div>
+            <div class="s1-icon"><i class="fa fa-angle-down"></i></div>
+        </div>
+        <div class="sidebar-2">
+            <div class="s2-item overview">
+                <div class="s2-icon"><i class="far fa-star"></i></div>
+                <div class="s2-link">Overview</div>
+            </div>
+            <div class="s2-item log">
+                <div class="s2-icon"><i class="fas fa-tasks"></i></div>
+                <div class="s2-link">Log Work</div>
+            </div>
+            <div class="s2-item spreadsheet">
+                <div class="s2-icon"><i class="fas fa-table"></i></div>
+                <div class="s2-link">Spreadsheet</div>
+            </div>
+            <div class="s2-item preferences">
+                <div class="s2-icon"><i class="fas fa-cogs"></i></div>
+                <div class="s2-link">Preferences</div>
+            </div>
+        </div>  
+    </div>
+    <div class="main">
+        <div class="heading">
+            <div class="icon"><i class="fa fa-book"></i></div>
+            <h1>Log</h1>
+        </div>
+        <div class="form">
+            <div class="subject">
+                <input list="topics_list" class="form-input" id="topic" placeholder="Topic" />
+                <datalist id="topics_list">
+                </datalist><br>
+                <input type="number" id='total' class="form-input" placeholder="Total Questions" min="1"><br>
+                <input type="number" id='time' class="form-input" placeholder="Time Taken (minutes)" min="1"><br>
+                <h3>Solved</h3>
+                <input type="number" id='oc' class="form-input" placeholder="Olympiad" min="0"><br>
+                <input type="number" id='hc' class="form-input" placeholder="Hard" min="1"><br>
+                <input type="number" id='mc' class="form-input" placeholder="Medium" min="1"><br>
+                <input type="number" id='ec' class="form-input" placeholder="Easy" min="1"><br>
+                <h3>Errors</h3>
+                <input type="text" class="form-input" id="error" list='error_list' placeholder="Category">
+                <datalist id="error_list">
+                    <option value="CO1">Didn't know concept/information</option>
+                    <option value="CO2">Misunderstood concept</option>
+                    <option value="DT1">Didn't try</option>
+                    <option value="CA1">Question not read properly</option>
+                    <option value="CA2">Wrong approach</option>
+                    <option value="CA3">Mental step wrong</option>
+                </datalist> <br>
+                <input type="number" class="form-input" min="1" id='no_error' placeholder='Number of mistakes'><br>
+                <div class="errors" id='errors' style="display: none;margin-top:16px;color:white;display:flex;width: 100%;"></div>
+                <button type="submit" class="btn-red">Add Error</button>
+                <button type="submit" id="submit">Submit Analysis</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        let _ = (el) => { return document.querySelector('#'+el).value };
+        let $ = (el) => { return document.querySelector('#'+el) };
+
+        document.querySelector('#submit').addEventListener('click', () => {
+            let topic = _('topic');
+            let subject = document.querySelector(`option[value="${topic}"]`).label;
+            let total = _('total');
+            let time = _('time');
+            let oc = _('oc'), hc = _('hc'), mc = _('mc'), ec =_('ec');
+            if(topic == '' || subject == '' || total == '' || (+oc) < 0 || (+hc) < 0 || (+ec) < 1 || (+mc) < 1 || time == ''){
+                return window.alert('Please fill all the fields accordingly!');
+            }
+            let errors = {
+                "co1": 0,
+                "co2": 0,
+                "dt1": 0,
+                "ca1": 0,
+                "ca2": 0,
+                "ca3": 0,
+                "ca4": 0
+            };
+            Array.from($('errors').children).map(i => errors[i.innerText.split(' ')[0].toLowerCase()] = errors[i.innerText.split(' ')[0].toLowerCase()] + (+i.innerText.split(' ').slice(-1)[0]))
+            total_er = 0;
+            Object.keys(errors).forEach(i => total_er += errors[i]);
+            if(total_er + (+oc) + (+hc) + (+mc) + (+ec) !== (+total)){
+                console.log(total_er + (+oc) + (+hc) + (+mc) + (+ec), +total)
+                return window.alert('Please check your inputs, there is a mismatch between error count + solved, and total.');
+            }
+            fetch('http://dash.sjdev.in/addLog', {
+                method: 'POST',
+                headers: {
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify({
+                    topic: topic,
+                    total: total,
+                    time: time,
+                    oc: oc,
+                    hc: hc,
+                    mc: mc,
+                    ec: ec,
+                    errors: errors,
+                    subject: subject
+                })
+            })
+            window.alert('Submitted!')
+        })
+
+        document.querySelector('.btn-red').addEventListener('click', () => {
+            let error = document.querySelector('.errors');
+            error.style.display = 'block';
+            error.innerHTML += `<span onclick='removeErr(this)' style='background-color:rgb(60, 65, 68);border-radius:3px;padding:3px 8px;margin-right:10px;display:inline-block;width:max-content;'><span style='font-weight:600;color:rgba(234, 135, 140, 1);fill:rgba(242, 178, 179, 1);'>${document.querySelector('#error').value}</span> &nbsp; ${document.querySelector('#no_error').value}</span>`;
+            document.querySelector('#error').value = '';
+            document.querySelector('#no_error').value = ''
+        })
+
+        function removeErr(thing){
+            thing.outerHTML = '';
+        }
+
+
+        fetch('http://dash.sjdev.in/fetch/log')
+        .then(r => r.json())
+        .then(d => {
+            Object.keys(d).forEach(i => {
+                d[i].forEach(x => {
+                    document.querySelector('#topics_list').innerHTML += `<option value='${x}' label='${i}'>${x}</option>`
+                })
+            })
+        })
+    
+       
+    </script>
+    <script src="./script.js"></script>
+</body>
+</html>

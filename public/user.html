@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1 style="text-align: center;margin-top: 180px;">Who is using this account? <br>
+        <select  style="width: max-content;margin: 0 auto; color: white;opacity: 0.9;font-weight: 500; background: none;border: 1px solid white; border-radius: 3px; padding: 5px ;margin-bottom: 12px;font-size: 16px;" id="users">
+        </select>
+        <button id="submit">Start</button>
+    </h1>
+    <script>
+        fetch('http://dash.sjdev.in/fetch/users')
+        .then(r => r.json())
+        .then(d => {
+            console.log(d)
+            document.querySelector('#users').innerHTML += d.error.data.map(i => `<option>${i.charAt(0).toUpperCase() + i.slice(1,i.length)}</option>`).join('');
+        })
+
+        document.querySelector('#submit').addEventListener('click',i => {
+            document.cookie = `user=${document.querySelector('#users').value.toLowerCase()}`
+            setTimeout(() => {
+                window.open('http://dash.sjdev.in/', '_self');
+            }, 1000)
+        })
+    </script>
+</body>
+</html>
