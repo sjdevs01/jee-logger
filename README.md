@@ -1,1 +1,2 @@
-# jee-logger
+# JEE Logger
+And a notion UI clone... And a JEE analyser... And a very personal tutor...
